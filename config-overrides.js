@@ -49,6 +49,74 @@ module.exports = function override(config, env) {
         style: true,
     }], config);
 
+    config.module.rules[2].oneOf.unshift(
+        {
+            test: /\.css$/,
+            include: /node_modules[\\/]antd-mobile/,
+            use: [
+                require.resolve('style-loader'),
+                {
+                    loader: require.resolve('css-loader'),
+                    options: {
+                        modules:false
+                    },
+                },
+                {
+                    loader: require.resolve('postcss-loader'),
+                    options: {
+                        ident: 'postcss',
+                        plugins: () => [
+                            require('postcss-flexbugs-fixes'),
+                            autoprefixer({
+                                browsers: [
+                                    '>1%',
+                                    'last 4 versions',
+                                    'Firefox ESR',
+                                    'not ie < 9', // React doesn't support IE8 anyway
+                                ],
+                                flexbox: 'no-2009',
+                            }),
+                        ],
+                    },
+                },
+            ]
+        },
+        {
+            test: /\.css$/,
+            exclude: /node_modules[\\/]antd-mobile/,
+            use: [
+                require.resolve('style-loader'),
+                {
+                    loader: require.resolve('css-loader'),
+                    options: {
+                        modules: true,
+                        importLoaders: 1,
+                        localIdentName: '[name]__[local]___[hash:base64:5]'
+                    },
+                },
+                {
+                    loader: require.resolve('postcss-loader'),
+                    options: {
+                        ident: 'postcss',
+                        plugins: () => [
+                            require('postcss-flexbugs-fixes'),
+                            autoprefixer({
+                                browsers: [
+                                    '>1%',
+                                    'last 4 versions',
+                                    'Firefox ESR',
+                                    'not ie < 9', // React doesn't support IE8 anyway
+                                ],
+                                flexbox: 'no-2009',
+                            }),
+                        ],
+                    },
+                },
+            ]
+        },
+
+    );
+
     // customize theme
     //https://github.com/ant-design/antd-mobile-samples/blob/master/create-react-app/config-overrides.js
     config.module.rules[2].oneOf.unshift(
@@ -103,6 +171,8 @@ module.exports = function override(config, env) {
             ]
         }
     );
+
+
 
     // file-loader exclude
     let l = getLoader(config.module.rules, fileLoaderMatcher);
